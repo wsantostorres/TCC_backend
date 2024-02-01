@@ -27,9 +27,9 @@ public class StudentModel {
     @Column(nullable = false)
     private String bondType;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String course;
+    @ManyToOne
+    @JoinColumn(name="course_id")
+    private CourseModel course;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "VACANCIES_STUDENTS",

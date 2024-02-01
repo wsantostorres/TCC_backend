@@ -15,11 +15,15 @@ import java.util.List;
 public class CourseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @NotBlank
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<StudentModel> students = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "VACANCIES_COURSES",
@@ -29,4 +33,6 @@ public class CourseModel {
                     referencedColumnName = "id"))
     @JsonIgnore
     private List<VacancyModel> vacancies = new ArrayList<>();
+
+
 }

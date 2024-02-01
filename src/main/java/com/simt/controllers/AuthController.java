@@ -2,9 +2,11 @@ package com.simt.controllers;
 
 import com.simt.dtos.UserGetDataDto;
 import com.simt.dtos.UserRegisterDto;
+import com.simt.models.CourseModel;
 import com.simt.models.EmployeeModel;
 import com.simt.models.StudentModel;
 import com.simt.models.VacancyModel;
+import com.simt.repositories.CourseRepository;
 import com.simt.repositories.EmployeeRepository;
 import com.simt.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class AuthController {
     @Autowired
     EmployeeRepository employeeRepository;
 
+    @Autowired
+    CourseRepository courseRepository;
+
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody UserRegisterDto userRegisterDto){
         try{
@@ -44,10 +49,20 @@ public class AuthController {
                 newUser.setRegistration(userRegisterDto.registration());
                 newUser.setFullName(userRegisterDto.fullName());
                 newUser.setBondType(userRegisterDto.bondType());
-                newUser.setCourse(userRegisterDto.course());
+
+                CourseModel course = courseRepository.findByName(userRegisterDto.course());
+                newUser.setCourse(course);
 
                 StudentModel studentCreated = studentRepository.save(newUser);
-                return ResponseEntity.status(HttpStatus.CREATED).body(studentCreated);
+
+                Map<String, Object> dataStudent = new HashMap<>();
+                dataStudent.put("id", studentCreated.getId());
+                dataStudent.put("fullName", studentCreated.getFullName());
+                dataStudent.put("bondType", studentCreated.getBondType());
+                dataStudent.put("courseId", studentCreated.getCourse().getId());
+                dataStudent.put("courseName", studentCreated.getCourse().getName());
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(dataStudent);
             }else{
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vínculo não permitido.");
             }
@@ -78,7 +93,8 @@ public class AuthController {
                     dataStudent.put("id", student.getId());
                     dataStudent.put("fullName", student.getFullName());
                     dataStudent.put("bondType", student.getBondType());
-                    dataStudent.put("course", student.getCourse());
+                    dataStudent.put("courseId", student.getCourse().getId());
+                    dataStudent.put("courseName", student.getCourse().getName());
                     dataStudent.put("created", true);
 
                     List<Long> vacanciesIds = student.getVacancies()

@@ -47,7 +47,7 @@ public class VacancyController {
 
     @GetMapping
     public ResponseEntity<VacancyPageResponse> getAllVacancies(@RequestHeader(name = "bondType") String bondType,
-                                                               @RequestHeader(name = "course") String course,
+                                                               @RequestHeader(name = "courseId", required = false) Long courseId,
                                                                @RequestParam(defaultValue = "1") int page){
 
         Sort sort = null;
@@ -63,7 +63,7 @@ public class VacancyController {
             }else{
                 sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
                 pageable = PageRequest.of(page - 1, 9, sort);
-                pageVacanciesModel = vacancyRepository.findByCourses(course, pageable);
+                pageVacanciesModel = vacancyRepository.findByCourses(courseId, pageable);
             }
 
             List<VacancyGetAllDto> listVacanciesDto = pageVacanciesModel.stream()
@@ -124,7 +124,7 @@ public class VacancyController {
     @GetMapping("/search")
     public ResponseEntity<VacancyPageResponse> searchByTitle(
             @RequestHeader(name = "bondType") String bondType,
-            @RequestHeader(name = "course") String course,
+            @RequestHeader(name = "courseId", required = false) Long courseId,
             @RequestParam(name = "title") String title,
             @RequestParam(defaultValue = "1") int page){
 
@@ -142,7 +142,7 @@ public class VacancyController {
 
                 sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
                 pageable = PageRequest.of(page - 1, 9, sort);
-                pageVacanciesModel = vacancyRepository.searchByTitleAndCourse(title.trim().toUpperCase(), course, pageable);
+                pageVacanciesModel = vacancyRepository.searchByTitleAndCourse(title.trim().toUpperCase(), courseId, pageable);
             }
 
             List<VacancyGetAllDto> listVacanciesDto = pageVacanciesModel.stream()
@@ -258,8 +258,7 @@ public class VacancyController {
             if(studentOptional.isPresent() && vacancyOptional.isPresent()) {
                 StudentModel student = studentOptional.get();
                 VacancyModel vacancy = vacancyOptional.get();
-                String studentCourseString = student.getCourse();
-                CourseModel studentCourse = courseRepository.findByName(studentCourseString);
+                CourseModel studentCourse = student.getCourse();
 
                 if (!vacancy.getCourses().contains(studentCourse)) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -300,7 +299,7 @@ public class VacancyController {
                 /* Aqui, na hora de atualizar a vaga eu
                 estou removendo todos os cursos da vaga existente
                 e depois colocando os novos cursos que vieram, isso pode ser melhorado
-                porque às vezes os cursos enviados podem ser iguais aos que já tem e aqui
+                porque às vezes os cursos enviados podem ser iguais aos que já tem, e aqui
                 acaba removendo e adicionando de novo de qualquer forma. */
                 List<CourseModel> currentCourses = existingVacancy.getCourses();
                 List<CourseModel> coursesToRemove = new ArrayList<>();
@@ -339,9 +338,9 @@ public class VacancyController {
                 existingVacancy.setModifiedIn(LocalDateTime.now());
                 existingVacancy.setCourses(selectedCourses);
 
-                VacancyModel updatedVacancy = vacancyRepository.save(existingVacancy);
+                vacancyRepository.save(existingVacancy);
 
-                return ResponseEntity.status(HttpStatus.OK).body(updatedVacancy);
+                return ResponseEntity.status(HttpStatus.OK).body(null);
             }
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
