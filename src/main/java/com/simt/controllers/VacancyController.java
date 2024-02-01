@@ -1,6 +1,6 @@
 package com.simt.controllers;
 
-import com.simt.models.EmployeeModel;
+import com.simt.dtos.VacancyPageResponse;
 import com.simt.models.StudentModel;
 import com.simt.repositories.StudentRepository;
 import com.simt.services.GenerateResumeService;
@@ -13,6 +13,9 @@ import com.simt.repositories.CourseRepository;
 import com.simt.repositories.VacancyRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,20 +46,48 @@ public class VacancyController {
     GenerateResumeService generateResumeService;
 
     @GetMapping
-    public ResponseEntity<List<VacancyGetAllDto>> getAllVacancies(){
-        Sort sortByDateLastModified = Sort.by(Sort.Direction.DESC, "lastModified");
-        List<VacancyModel> listVacanciesModel = vacancyRepository.findAll(sortByDateLastModified);
+    public ResponseEntity<VacancyPageResponse> getAllVacancies(@RequestHeader(name = "bondType") String bondType,
+                                                               @RequestHeader(name = "course") String course,
+                                                               @RequestParam(defaultValue = "1") int page){
+
+        Sort sort = null;
+        Pageable pageable = null;
+        Page<VacancyModel> pageVacanciesModel = null;
 
         try{
 
-            List<VacancyGetAllDto> listVacanciesDto = listVacanciesModel.stream()
+            if(bondType.equals("Servidor")){
+                sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
+                pageable = PageRequest.of(page - 1, 9, sort);
+                pageVacanciesModel = vacancyRepository.findAll(pageable);
+            }else{
+                sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
+                pageable = PageRequest.of(page - 1, 9, sort);
+                pageVacanciesModel = vacancyRepository.findByCourses(course, pageable);
+            }
+
+            List<VacancyGetAllDto> listVacanciesDto = pageVacanciesModel.stream()
                     .map(VacancyMapper::mapToDto)
                     .collect(Collectors.toList());
 
-            return ResponseEntity.status(HttpStatus.OK).body(listVacanciesDto);
+            VacancyPageResponse response;
+
+            if (listVacanciesDto.isEmpty()) {
+                response = new VacancyPageResponse(Collections.emptyList(), 0, 0, 0, 0);
+            } else {
+                response = new VacancyPageResponse(
+                        listVacanciesDto,
+                        pageVacanciesModel.getTotalElements(),
+                        pageVacanciesModel.getTotalPages(),
+                        pageVacanciesModel.getNumber(),
+                        pageVacanciesModel.getSize()
+                );
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -91,22 +122,50 @@ public class VacancyController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<VacancyGetAllDto>> searchByTitle(
+    public ResponseEntity<VacancyPageResponse> searchByTitle(
+            @RequestHeader(name = "bondType") String bondType,
+            @RequestHeader(name = "course") String course,
             @RequestParam(name = "title") String title,
-            @RequestParam(required = false) String course,
-            @RequestHeader(name = "bondType") String bondType
-    ){
+            @RequestParam(defaultValue = "1") int page){
 
-        List<VacancyModel> listVacanciesModel = vacancyRepository.searchByTitle(title.trim().toUpperCase());
+        Sort sort = null;
+        Pageable pageable = null;
+        Page<VacancyModel> pageVacanciesModel = null;
 
         try{
-            List<VacancyGetAllDto> listVacanciesDto = listVacanciesModel.stream()
+
+            if(bondType.equals("Servidor")){
+                sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
+                pageable = PageRequest.of(page - 1, 9, sort);
+                pageVacanciesModel = vacancyRepository.searchByTitle(title.trim().toUpperCase(), pageable);
+            }else{
+
+                sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
+                pageable = PageRequest.of(page - 1, 9, sort);
+                pageVacanciesModel = vacancyRepository.searchByTitleAndCourse(title.trim().toUpperCase(), course, pageable);
+            }
+
+            List<VacancyGetAllDto> listVacanciesDto = pageVacanciesModel.stream()
                     .map(VacancyMapper::mapToDto)
                     .collect(Collectors.toList());
 
-            return ResponseEntity.status(HttpStatus.OK).body(listVacanciesDto);
+            VacancyPageResponse response;
+
+            if (listVacanciesDto.isEmpty()) {
+                response = new VacancyPageResponse(Collections.emptyList(), 0, 0, 0, 0);
+            } else {
+                response = new VacancyPageResponse(
+                        listVacanciesDto,
+                        pageVacanciesModel.getTotalElements(),
+                        pageVacanciesModel.getTotalPages(),
+                        pageVacanciesModel.getNumber(),
+                        pageVacanciesModel.getSize()
+                );
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -160,7 +219,7 @@ public class VacancyController {
         requestData.setAfternoon(vacancyDto.afternoon());
         requestData.setNight(vacancyDto.night());
         requestData.setClosingDate(combinedDateTime);
-        requestData.setLastModified(LocalDateTime.now());
+        requestData.setModifiedIn(LocalDateTime.now());
 
         /* Aqui está ocorrendo o relacionamento entre
         vagas e cursos na hora do cadastro */
@@ -277,7 +336,7 @@ public class VacancyController {
                 existingVacancy.setAfternoon(vacancyDto.afternoon());
                 existingVacancy.setNight(vacancyDto.night());
                 existingVacancy.setClosingDate(combinedDateTime);
-                existingVacancy.setLastModified(LocalDateTime.now());
+                existingVacancy.setModifiedIn(LocalDateTime.now());
                 existingVacancy.setCourses(selectedCourses);
 
                 VacancyModel updatedVacancy = vacancyRepository.save(existingVacancy);

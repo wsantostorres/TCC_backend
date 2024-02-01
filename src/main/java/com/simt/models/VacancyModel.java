@@ -40,7 +40,7 @@ public class VacancyModel {
     private int night;
 
     @Column(nullable = false)
-    private LocalDateTime lastModified;
+    private LocalDateTime modifiedIn;
 
     @ManyToMany(mappedBy = "vacancies", fetch = FetchType.LAZY)
     private List<CourseModel> courses = new ArrayList<>();

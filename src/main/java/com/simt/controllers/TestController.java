@@ -116,7 +116,7 @@ public class TestController {
             vacancy.setAfternoon(0);
             vacancy.setNight(0);
             vacancy.setClosingDate(combinedDateTime);
-            vacancy.setLastModified(LocalDateTime.now());
+            vacancy.setModifiedIn(LocalDateTime.now());
 
             CourseModel course = courseRepository.findByName("Tecnologia em Análise e Desenvolvimento de Sistemas");
             course.getVacancies().add(vacancy);
@@ -151,7 +151,7 @@ public class TestController {
                 vacancy.setAfternoon(0);
                 vacancy.setNight(0);
                 vacancy.setClosingDate(combinedDateTime);
-                vacancy.setLastModified(LocalDateTime.now());
+                vacancy.setModifiedIn(LocalDateTime.now());
 
                 CourseModel course = courseRepository.findByName("Tecnologia em Análise e Desenvolvimento de Sistemas");
                 course.getVacancies().add(vacancy);
