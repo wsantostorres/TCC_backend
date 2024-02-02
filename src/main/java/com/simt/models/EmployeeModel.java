@@ -1,5 +1,6 @@
 package com.simt.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -28,5 +29,6 @@ public class EmployeeModel {
     private String bondType;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<VacancyModel> vacancies = new ArrayList<>();
 }

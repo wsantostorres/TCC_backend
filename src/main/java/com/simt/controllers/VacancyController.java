@@ -1,7 +1,9 @@
 package com.simt.controllers;
 
 import com.simt.dtos.VacancyPageResponse;
+import com.simt.models.EmployeeModel;
 import com.simt.models.StudentModel;
+import com.simt.repositories.EmployeeRepository;
 import com.simt.repositories.StudentRepository;
 import com.simt.services.GenerateResumeService;
 import com.simt.utils.VacancyMapper;
@@ -42,6 +44,8 @@ public class VacancyController {
     @Autowired
     StudentRepository studentRepository;
 
+    @Autowired
+    EmployeeRepository employeeRepository;
     @Autowired
     GenerateResumeService generateResumeService;
 
@@ -112,8 +116,8 @@ public class VacancyController {
                     vacancyModel.getMorning(),
                     vacancyModel.getAfternoon(),
                     vacancyModel.getNight(),
-                    vacancyModel.getCourses()
-
+                    vacancyModel.getCourses(),
+                    vacancyModel.getEmployee().getId()
             );
 
             return ResponseEntity.status(HttpStatus.OK).body(vacancyDto);
@@ -207,46 +211,52 @@ public class VacancyController {
     }
 
     @PostMapping
-    public ResponseEntity<VacancyModel> createVacancy(@Valid @RequestBody VacancyDto vacancyDto) {
-        LocalDate parsedClosingDate = LocalDate.parse(vacancyDto.closingDate(), DateTimeFormatter.ISO_DATE);
-        LocalDateTime combinedDateTime = LocalDateTime.of(parsedClosingDate, LocalTime.of(23, 59));
+    public ResponseEntity<Object> createVacancy(@Valid @RequestBody VacancyDto vacancyDto) {
+        try{
+            Optional<EmployeeModel> employeeOptional = employeeRepository.findById(vacancyDto.employeeId());
 
-        VacancyModel requestData = new VacancyModel();
-        requestData.setTitle(vacancyDto.title());
-        requestData.setDescription(vacancyDto.description());
-        requestData.setType(vacancyDto.type());
-        requestData.setMorning(vacancyDto.morning());
-        requestData.setAfternoon(vacancyDto.afternoon());
-        requestData.setNight(vacancyDto.night());
-        requestData.setClosingDate(combinedDateTime);
-        requestData.setModifiedIn(LocalDateTime.now());
+            if(employeeOptional.isPresent()){
+                LocalDate parsedClosingDate = LocalDate.parse(vacancyDto.closingDate(), DateTimeFormatter.ISO_DATE);
+                LocalDateTime combinedDateTime = LocalDateTime.of(parsedClosingDate, LocalTime.of(23, 59));
 
-        /* Aqui está ocorrendo o relacionamento entre
-        vagas e cursos na hora do cadastro */
-        List<CourseModel> courses = courseRepository.findAll();
-        List<CourseModel> vacancyCoursesDto = vacancyDto.courses();
+                VacancyModel requestData = new VacancyModel();
+                requestData.setTitle(vacancyDto.title());
+                requestData.setDescription(vacancyDto.description());
+                requestData.setType(vacancyDto.type());
+                requestData.setMorning(vacancyDto.morning());
+                requestData.setAfternoon(vacancyDto.afternoon());
+                requestData.setNight(vacancyDto.night());
+                requestData.setClosingDate(combinedDateTime);
+                requestData.setModifiedIn(LocalDateTime.now());
+                requestData.setEmployee(employeeOptional.get());
 
-        if (courses.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+                List<CourseModel> courses = courseRepository.findAll();
+                List<CourseModel> vacancyCoursesDto = vacancyDto.courses();
 
-        List<CourseModel> selectedCourses = new ArrayList<>();
+                List<CourseModel> selectedCourses = new ArrayList<>();
 
-        for (CourseModel course : courses) {
-            for (CourseModel vacancyCourseDto : vacancyCoursesDto) {
-                if (vacancyCourseDto.getId() == course.getId()) {
-                    course.getVacancies().add(requestData);
-                    selectedCourses.add(course);
+                for (CourseModel course : courses) {
+                    for (CourseModel vacancyCourseDto : vacancyCoursesDto) {
+                        if (vacancyCourseDto.getId() == course.getId()) {
+                            course.getVacancies().add(requestData);
+                            selectedCourses.add(course);
+                        }
+                    }
                 }
+
+                if(selectedCourses.isEmpty()){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                }
+                requestData.setCourses(selectedCourses);
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(vacancyRepository.save(requestData));
             }
-        }
 
-        if(selectedCourses.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        requestData.setCourses(selectedCourses);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Apenas servidores podem cadastrar vagas");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(vacancyRepository.save(requestData));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao cadastrar a vaga");
+        }
     }
 
     @PostMapping("/send-resume/{studentId}/{vacancyId}")
@@ -288,64 +298,72 @@ public class VacancyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VacancyModel> updateVacancy(@PathVariable long id, @Valid @RequestBody VacancyDto vacancyDto) {
+    public ResponseEntity<Object> updateVacancy(@PathVariable long id, @Valid @RequestBody VacancyDto vacancyDto) {
         try {
             Optional<VacancyModel> existingVacancyOptional = vacancyRepository.findById(id);
 
             if (existingVacancyOptional.isPresent()) {
 
-                VacancyModel existingVacancy = existingVacancyOptional.get();
+                Optional<EmployeeModel> employeeOptional = employeeRepository.findById(vacancyDto.employeeId());
 
-                /* Aqui, na hora de atualizar a vaga eu
-                estou removendo todos os cursos da vaga existente
-                e depois colocando os novos cursos que vieram, isso pode ser melhorado
-                porque às vezes os cursos enviados podem ser iguais aos que já tem, e aqui
-                acaba removendo e adicionando de novo de qualquer forma. */
-                List<CourseModel> currentCourses = existingVacancy.getCourses();
-                List<CourseModel> coursesToRemove = new ArrayList<>();
+                if(employeeOptional.isPresent()){
+                    VacancyModel existingVacancy = existingVacancyOptional.get();
 
-                for (CourseModel currentCourse : currentCourses) {
-                    currentCourse.getVacancies().remove(existingVacancy);
-                    coursesToRemove.add(currentCourse);
-                }
+                    /* Aqui, na hora de atualizar a vaga eu
+                    estou removendo todos os cursos da vaga existente
+                    e depois colocando os novos cursos que vieram, isso pode ser melhorado
+                    porque às vezes os cursos enviados podem ser iguais aos que já tem, e aqui
+                    acaba removendo e adicionando de novo de qualquer forma. */
+                    List<CourseModel> currentCourses = existingVacancy.getCourses();
+                    List<CourseModel> coursesToRemove = new ArrayList<>();
 
-                existingVacancy.getCourses().removeAll(coursesToRemove);
+                    for (CourseModel currentCourse : currentCourses) {
+                        currentCourse.getVacancies().remove(existingVacancy);
+                        coursesToRemove.add(currentCourse);
+                    }
 
-                List<CourseModel> courses = courseRepository.findAll();
-                List<CourseModel> vacancyCoursesDto = vacancyDto.courses();
+                    existingVacancy.getCourses().removeAll(coursesToRemove);
 
-                List<CourseModel> selectedCourses = new ArrayList<>();
+                    List<CourseModel> courses = courseRepository.findAll();
+                    List<CourseModel> vacancyCoursesDto = vacancyDto.courses();
 
-                for (CourseModel course : courses) {
-                    for (CourseModel vacancyCourseDto : vacancyCoursesDto) {
-                        if (vacancyCourseDto.getId() == course.getId()) {
-                            course.getVacancies().add(existingVacancy);
-                            selectedCourses.add(course);
+                    List<CourseModel> selectedCourses = new ArrayList<>();
+
+                    for (CourseModel course : courses) {
+                        for (CourseModel vacancyCourseDto : vacancyCoursesDto) {
+                            if (vacancyCourseDto.getId() == course.getId()) {
+                                course.getVacancies().add(existingVacancy);
+                                selectedCourses.add(course);
+                            }
                         }
                     }
+
+                    LocalDate parsedClosingDate = LocalDate.parse(vacancyDto.closingDate(), DateTimeFormatter.ISO_DATE);
+                    LocalDateTime combinedDateTime = LocalDateTime.of(parsedClosingDate, LocalTime.of(23, 59));
+
+                    existingVacancy.setTitle(vacancyDto.title());
+                    existingVacancy.setDescription(vacancyDto.description());
+                    existingVacancy.setType(vacancyDto.type());
+                    existingVacancy.setMorning(vacancyDto.morning());
+                    existingVacancy.setAfternoon(vacancyDto.afternoon());
+                    existingVacancy.setNight(vacancyDto.night());
+                    existingVacancy.setClosingDate(combinedDateTime);
+                    existingVacancy.setModifiedIn(LocalDateTime.now());
+                    existingVacancy.setCourses(selectedCourses);
+                    existingVacancy.setEmployee(employeeOptional.get());
+
+                    vacancyRepository.save(existingVacancy);
+
+                    return ResponseEntity.status(HttpStatus.OK).body(null);
                 }
 
-                LocalDate parsedClosingDate = LocalDate.parse(vacancyDto.closingDate(), DateTimeFormatter.ISO_DATE);
-                LocalDateTime combinedDateTime = LocalDateTime.of(parsedClosingDate, LocalTime.of(23, 59));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Apenas servidores podem cadastrar vagas");
 
-                existingVacancy.setTitle(vacancyDto.title());
-                existingVacancy.setDescription(vacancyDto.description());
-                existingVacancy.setType(vacancyDto.type());
-                existingVacancy.setMorning(vacancyDto.morning());
-                existingVacancy.setAfternoon(vacancyDto.afternoon());
-                existingVacancy.setNight(vacancyDto.night());
-                existingVacancy.setClosingDate(combinedDateTime);
-                existingVacancy.setModifiedIn(LocalDateTime.now());
-                existingVacancy.setCourses(selectedCourses);
-
-                vacancyRepository.save(existingVacancy);
-
-                return ResponseEntity.status(HttpStatus.OK).body(null);
             }
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vaga não encontrada");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao atualizar vaga");
         }
     }
 
