@@ -124,7 +124,7 @@ public class ResumeServiceImpl implements ResumeService {
         Optional<StudentModel> studentOptional = studentRepository.findById(studentId);
 
         if(resumeModelOptional.isPresent() && studentOptional.isPresent()
-        && resumeModelOptional.get().getUser().getId().equals(studentOptional.get().getId())){
+        && resumeModelOptional.get().getStudent().getId().equals(studentOptional.get().getId())){
 
             ResumeModel existingResumeModel = resumeModelOptional.get();
             existingResumeModel.setObjectiveDescription(resumeDto.objectiveDescription());

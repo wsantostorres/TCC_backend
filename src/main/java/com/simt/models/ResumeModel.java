@@ -39,5 +39,5 @@ public class ResumeModel {
 
     @OneToOne(mappedBy = "resume")
     @JsonIgnore
-    private StudentModel user;
+    private StudentModel student;
 }

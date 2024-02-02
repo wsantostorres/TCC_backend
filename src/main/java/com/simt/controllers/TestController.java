@@ -79,16 +79,16 @@ public class TestController {
     public ResponseEntity<Object> deleteStudentResume(@PathVariable Long studentId){
         try{
 
-            Optional<StudentModel> userOptional = studentRepository.findById(studentId);
+            Optional<StudentModel> studentOptional = studentRepository.findById(studentId);
             ResumeModel resume = null;
 
-            if(userOptional.isPresent()){
-                StudentModel user = userOptional.get();
-                resume = user.getResume();
+            if(studentOptional.isPresent()){
+                StudentModel student = studentOptional.get();
+                resume = student.getResume();
 
                 // Desvincular Usuario e Curriculo
-                user.setResume(null);
-                resume.setUser(null);
+                student.setResume(null);
+                resume.setStudent(null);
 
                 // Exclui o curriculo
                 resumeRepository.deleteById(resume.getId());
@@ -134,10 +134,10 @@ public class TestController {
     @PostMapping("/attach/{studentId}")
     public ResponseEntity<Object> attachVacancyStudentResume(@PathVariable Long studentId){
         try{
-            Optional<StudentModel> userOptional = studentRepository.findById(studentId);
+            Optional<StudentModel> studentOptional = studentRepository.findById(studentId);
 
-            if(userOptional.isPresent()){
-                StudentModel student = userOptional.get();
+            if(studentOptional.isPresent()){
+                StudentModel student = studentOptional.get();
 
                 // Criando Vaga
                 LocalDate parsedClosingDate = LocalDate.parse("2023-12-19", DateTimeFormatter.ISO_DATE);
