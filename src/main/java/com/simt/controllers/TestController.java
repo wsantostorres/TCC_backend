@@ -159,7 +159,6 @@ public class TestController {
 
                 // Criando Currículo
                 ResumeModel resume = new ResumeModel();
-                resume.setObjectiveDescription("Descrição teste");
 
                 AddressModel address = new AddressModel();
                 address.setCity("Nova Cruz");

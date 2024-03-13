@@ -128,8 +128,6 @@ public class GenerateResumeServiceImpl implements GenerateResumeService {
                 /* Substituir informações do currículo do Aluno aqui */
                 htmlTemplate = htmlTemplate.replace("{NOMECOMPLETO}", student.getFullName());
                 htmlTemplate = htmlTemplate.replace("{CONTATOENDERECO}", addressAndContactHtml);
-                htmlTemplate = htmlTemplate.replace("{OBJECTIVEDESCRIPTION}",
-                        student.getResume().getObjectiveDescription());
                 htmlTemplate = htmlTemplate.replace("{HABILIDADES}", skillsHtml);
                 htmlTemplate = htmlTemplate.replace("{FORMACAO}", formationsHtml);
                 htmlTemplate = htmlTemplate.replace("{PROJETOS}", projectsHtml);

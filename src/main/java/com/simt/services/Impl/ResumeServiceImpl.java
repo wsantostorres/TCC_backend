@@ -49,7 +49,6 @@ public class ResumeServiceImpl implements ResumeService {
             /* Só posso cadastrar se o aluno não tiver currículo cadastrado */
             if(studentOptional.isPresent() && studentOptional.get().getResume() == null){
                 ResumeModel resumeModel = new ResumeModel();
-                resumeModel.setObjectiveDescription(resumeDto.objectiveDescription());
 
                 List<ProjectModel> projects = new ArrayList<>();
                 List<ExperienceModel> experiences = new ArrayList<>();
@@ -127,7 +126,6 @@ public class ResumeServiceImpl implements ResumeService {
         && resumeModelOptional.get().getStudent().getId().equals(studentOptional.get().getId())){
 
             ResumeModel existingResumeModel = resumeModelOptional.get();
-            existingResumeModel.setObjectiveDescription(resumeDto.objectiveDescription());
 
             /* Atualizando Projetos */
             for (ProjectModel project : resumeDto.projects()) {
