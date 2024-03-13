@@ -64,7 +64,7 @@ public class AuthController {
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(dataStudent);
             }else{
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vínculo não permitido.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vínculo não permitido.");
             }
         }catch (Exception e){
             System.out.println("ERROR: " + e.getMessage());
@@ -131,10 +131,10 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.OK).body(dataEmployee);
                 }
 
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(UserId);
+                return ResponseEntity.status(HttpStatus.OK).body(UserId);
 
             }else{
-                return ResponseEntity.status(HttpStatus.OK).body(UserId);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vínculo não permitido.");
             }
         }catch (Exception e){
             System.out.println("ERROR: " + e.getMessage());
