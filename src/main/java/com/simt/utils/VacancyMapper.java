@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 public class VacancyMapper {
     public static VacancyGetAllDto mapToDto(VacancyModel vacancyModel) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        int quantityOfCandidatures = vacancyModel.getStudents().size();
+
         return new VacancyGetAllDto(
                 vacancyModel.getId(),
                 vacancyModel.getTitle(),
@@ -16,7 +18,8 @@ public class VacancyMapper {
                 vacancyModel.getType(),
                 vacancyModel.getMorning(),
                 vacancyModel.getAfternoon(),
-                vacancyModel.getNight()
+                vacancyModel.getNight(),
+                quantityOfCandidatures
         );
     }
 }

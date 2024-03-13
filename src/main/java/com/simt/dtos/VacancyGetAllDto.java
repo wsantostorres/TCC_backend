@@ -5,5 +5,6 @@ public record VacancyGetAllDto(long id,
                                String description,
                                int type, int morning,
                                int afternoon,
-                               int night){
+                               int night,
+                               int quantityOfCandidatures){
 }
