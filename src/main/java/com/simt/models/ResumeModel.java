@@ -19,6 +19,9 @@ public class ResumeModel {
     private List<ProjectModel> projects = new ArrayList<>();
 
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)
+    private List<ComplementaryCourseModel> complementaryCourses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)
     private List<ExperienceModel> experiences = new ArrayList<>();
 
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)

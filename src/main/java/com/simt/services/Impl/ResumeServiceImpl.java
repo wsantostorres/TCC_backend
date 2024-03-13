@@ -33,6 +33,9 @@ public class ResumeServiceImpl implements ResumeService {
     @Autowired
     SkillRepository skillRepository;
 
+    @Autowired
+    ComplementaryCourseRepository complementaryCourseRepository;
+
     @Override
     @Transactional
     public ResumeModel getResume(long id) {
@@ -54,6 +57,15 @@ public class ResumeServiceImpl implements ResumeService {
                 List<ExperienceModel> experiences = new ArrayList<>();
                 List<AcademicFormationModel> academics = new ArrayList<>();
                 List<SkillModel> skills = new ArrayList<>();
+                List<ComplementaryCourseModel> complementaryCourses = new ArrayList<>();
+
+                /* Adicionando Cursos Complementares */
+                for (ComplementaryCourseModel complementaryCourse : resumeDto.complementaryCourses()) {
+                    if(!complementaryCourse.getCourseName().isEmpty() && !complementaryCourse.getFoundation().isEmpty()){
+                        complementaryCourse.setResume(resumeModel);
+                        complementaryCourses.add(complementaryCourse);
+                    }
+                }
 
                 /* Adicionando Projetos */
                 for (ProjectModel project : resumeDto.projects()) {
@@ -98,6 +110,7 @@ public class ResumeServiceImpl implements ResumeService {
                 /* Relacionando Aluno e Currículo */
                 studentOptional.get().setResume(resumeModel);
 
+                resumeModel.setComplementaryCourses(complementaryCourses);
                 resumeModel.setProjects(projects);
                 resumeModel.setExperiences(experiences);
                 resumeModel.setAcademics(academics);
@@ -126,6 +139,30 @@ public class ResumeServiceImpl implements ResumeService {
         && resumeModelOptional.get().getStudent().getId().equals(studentOptional.get().getId())){
 
             ResumeModel existingResumeModel = resumeModelOptional.get();
+
+            /* Atualizando Cursos complementares */
+            for (ComplementaryCourseModel complementaryCourse : resumeDto.complementaryCourses()) {
+                if (complementaryCourse.getId() != null) {
+                    Optional<ComplementaryCourseModel> existingComplementaryCourse = complementaryCourseRepository.findById(complementaryCourse.getId());
+                    if (existingComplementaryCourse.isPresent()) {
+                        /* Se por acaso um curso complementar existir e tentar atualizar com campos vazios
+                          vou excluir o curso */
+                        if(complementaryCourse.getCourseName().isEmpty() && complementaryCourse.getFoundation().isEmpty()){
+                            complementaryCourseRepository.deleteById(complementaryCourse.getId());
+                        }else{
+                            existingComplementaryCourse.get().setFoundation(complementaryCourse.getFoundation());
+                            existingComplementaryCourse.get().setCourseName(complementaryCourse.getCourseName());
+                            existingComplementaryCourse.get().setInitialYear(complementaryCourse.getInitialYear());
+                            existingComplementaryCourse.get().setClosingYear(complementaryCourse.getClosingYear());
+                        }
+                    }
+                }else{
+                    if(!complementaryCourse.getCourseName().isEmpty() && !complementaryCourse.getFoundation().isEmpty()){
+                        complementaryCourse.setResume(existingResumeModel);
+                        existingResumeModel.getComplementaryCourses().add(complementaryCourse);
+                    }
+                }
+            }
 
             /* Atualizando Projetos */
             for (ProjectModel project : resumeDto.projects()) {

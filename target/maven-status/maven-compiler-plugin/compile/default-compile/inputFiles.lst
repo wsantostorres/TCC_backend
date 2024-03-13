@@ -1,6 +1,7 @@
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\controllers\TestController.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\dtos\VacancyPageResponse.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\models\VacancyModel.java
+C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\repositories\ComplementaryCourseRepository.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\services\GenerateResumeService.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\models\EmployeeModel.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\dtos\VacancyDto.java
@@ -18,6 +19,7 @@ C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\dtos\Resu
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\models\AcademicFormationModel.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\models\ContactModel.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\controllers\VacancyController.java
+C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\models\ComplementaryCourseModel.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\controllers\CourseController.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\GenericServiceApplication.java
 C:\Users\Wanderson\Documents\GitHub\TCC_backend\src\main\java\com\simt\models\ExperienceModel.java

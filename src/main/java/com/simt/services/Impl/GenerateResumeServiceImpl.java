@@ -117,6 +117,14 @@ public class GenerateResumeServiceImpl implements GenerateResumeService {
                     formationsHtml.append(valuesAcademic);
                 }
 
+                /* CURSOS COMPLEMENTARES */
+                StringBuilder complementaryCoursesHtml = new StringBuilder();
+                for(ComplementaryCourseModel complementaryCourse : student.getResume().getComplementaryCourses()){
+                    String valuesComplementaryCourse = "<li>" + "<p>" + complementaryCourse.getInitialYear() + "-" + complementaryCourse.getClosingYear() + " | " + complementaryCourse.getFoundation() + "</p>" +
+                            "<span>" + complementaryCourse.getCourseName() + "</span>" + "</li>";
+                    complementaryCoursesHtml.append(valuesComplementaryCourse);
+                }
+
                 /* PROJETOS */
                 StringBuilder projectsHtml = new StringBuilder();
                 for(ProjectModel project : student.getResume().getProjects()){
@@ -132,6 +140,7 @@ public class GenerateResumeServiceImpl implements GenerateResumeService {
                 htmlTemplate = htmlTemplate.replace("{FORMACAO}", formationsHtml);
                 htmlTemplate = htmlTemplate.replace("{PROJETOS}", projectsHtml);
                 htmlTemplate = htmlTemplate.replace("{EXPERIENCIAS}", experiencesHtml);
+                htmlTemplate = htmlTemplate.replace("{CURSOSCOMPLEMENTARES}", complementaryCoursesHtml);
 
                 return htmlTemplate;
             } else {

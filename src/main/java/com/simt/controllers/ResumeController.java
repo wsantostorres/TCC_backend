@@ -82,7 +82,7 @@ public class ResumeController {
                                                     @PathVariable Long studentId) {
         try {
             if(resumeDto.projects().size() > 3 || resumeDto.experiences().size() > 5 || resumeDto.academics().size() > 3
-            || resumeDto.skills().size() > 5){
+            || resumeDto.skills().size() > 5 || resumeDto.complementaryCourses().size() > 5){
                 throw new Exception("quantidade nao permitida");
             }
             ResumeModel savedResume = resumeService.createResume(studentId, resumeDto);
@@ -104,7 +104,7 @@ public class ResumeController {
         try{
 
             if(resumeDto.projects().size() > 3 || resumeDto.experiences().size() > 5 || resumeDto.academics().size() > 3
-                    || resumeDto.skills().size() > 5){
+                    || resumeDto.skills().size() > 5 || resumeDto.complementaryCourses().size() > 5){
                 throw new Exception("quantidade nao permitida");
             }
 

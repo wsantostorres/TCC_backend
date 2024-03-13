@@ -9,6 +9,7 @@ com\simt\models\AddressModel.class
 com\simt\models\CourseModel.class
 com\simt\utils\VacancyMapper.class
 com\simt\WebConfig.class
+com\simt\models\ComplementaryCourseModel.class
 com\simt\configs\RegisterCourses.class
 com\simt\dtos\VacancyGetAllDto.class
 com\simt\dtos\VacancyPageResponse.class
@@ -40,4 +41,5 @@ com\simt\dtos\UserGetDataDto.class
 com\simt\models\VacancyModel.class
 com\simt\repositories\CourseRepository.class
 com\simt\dtos\VacancyDeleteDto.class
+com\simt\repositories\ComplementaryCourseRepository.class
 com\simt\configs\SecurityConfig.class
