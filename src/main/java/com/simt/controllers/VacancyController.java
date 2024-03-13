@@ -1,5 +1,6 @@
 package com.simt.controllers;
 
+import com.simt.dtos.VacancyDeleteDto;
 import com.simt.dtos.VacancyPageResponse;
 import com.simt.models.EmployeeModel;
 import com.simt.models.StudentModel;
@@ -63,7 +64,7 @@ public class VacancyController {
             if(bondType.equals("Servidor")){
                 sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
                 pageable = PageRequest.of(page - 1, 9, sort);
-                pageVacanciesModel = vacancyRepository.findAll(pageable);
+                pageVacanciesModel = vacancyRepository.findAllVacancies(pageable);
             }else{
                 sort = Sort.by(Sort.Direction.DESC, "modifiedIn");
                 pageable = PageRequest.of(page - 1, 9, sort);
@@ -357,7 +358,7 @@ public class VacancyController {
                     return ResponseEntity.status(HttpStatus.OK).body(null);
                 }
 
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Apenas servidores podem cadastrar vagas");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Apenas servidores podem atualizar vagas");
 
             }
 
@@ -368,25 +369,27 @@ public class VacancyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteVacancy(@PathVariable long id){
+    public ResponseEntity<Object> deleteVacancy(@PathVariable long id, @RequestBody VacancyDeleteDto vacancyDeleteDto){
         try{
             Optional<VacancyModel> vacancyOptional = vacancyRepository.findById(id);
 
             if(vacancyOptional.isPresent()){
-                VacancyModel vacancy = vacancyOptional.get();
-                List<CourseModel> relatedCourses = vacancy.getCourses();
 
-                for (CourseModel relatedCourse : relatedCourses) {
-                    relatedCourse.getVacancies().remove(vacancy);
+                Optional<EmployeeModel> employeeOptional = employeeRepository.findById(vacancyDeleteDto.employeeId());
+
+                // SoftDelete
+                if(employeeOptional.isPresent()){
+                    VacancyModel vacancy = vacancyOptional.get();
+                    EmployeeModel employee = employeeOptional.get();
+                    vacancy.setDeletedAt(LocalDateTime.now());
+                    vacancy.setEmployee(employee);
+
+                    vacancyRepository.save(vacancy);
+                    return ResponseEntity.status(HttpStatus.OK).body(null);
                 }
 
-                List<StudentModel> relatedStudents = vacancy.getStudents();
-                for (StudentModel relatedStudent : relatedStudents) {
-                    relatedStudent.getVacancies().remove(vacancy);
-                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Apenas servidores podem excluir vagas");
 
-                vacancyRepository.deleteById(id);
-                return ResponseEntity.status(HttpStatus.OK).body(null);
             }
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

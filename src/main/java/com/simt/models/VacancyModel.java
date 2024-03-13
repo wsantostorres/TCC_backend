@@ -39,6 +39,9 @@ public class VacancyModel {
     @Column
     private int night;
 
+    @Column
+    private LocalDateTime deletedAt = null;
+
     @Column(nullable = false)
     private LocalDateTime modifiedIn;
 

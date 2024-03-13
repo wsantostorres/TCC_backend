@@ -39,4 +39,5 @@ com\simt\dtos\ResumeDto.class
 com\simt\dtos\UserGetDataDto.class
 com\simt\models\VacancyModel.class
 com\simt\repositories\CourseRepository.class
+com\simt\dtos\VacancyDeleteDto.class
 com\simt\configs\SecurityConfig.class
