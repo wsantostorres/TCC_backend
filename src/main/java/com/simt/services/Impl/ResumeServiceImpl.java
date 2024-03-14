@@ -61,42 +61,32 @@ public class ResumeServiceImpl implements ResumeService {
 
                 /* Adicionando Cursos Complementares */
                 for (ComplementaryCourseModel complementaryCourse : resumeDto.complementaryCourses()) {
-                    if(!complementaryCourse.getCourseName().isEmpty() && !complementaryCourse.getFoundation().isEmpty()){
-                        complementaryCourse.setResume(resumeModel);
-                        complementaryCourses.add(complementaryCourse);
-                    }
+                    complementaryCourse.setResume(resumeModel);
+                    complementaryCourses.add(complementaryCourse);
                 }
 
                 /* Adicionando Projetos */
                 for (ProjectModel project : resumeDto.projects()) {
-                    if(!project.getTitleProject().isEmpty() && !project.getFoundation().isEmpty()){
-                        project.setResume(resumeModel);
-                        projects.add(project);
-                    }
+                    project.setResume(resumeModel);
+                    projects.add(project);
                 }
 
                 /* Adicionando Experiencias */
                 for (ExperienceModel experience : resumeDto.experiences()) {
-                    if(!experience.getCompany().isEmpty() && !experience.getFunctionName().isEmpty()){
-                        experience.setResume(resumeModel);
-                        experiences.add(experience);
-                    }
+                    experience.setResume(resumeModel);
+                    experiences.add(experience);
                 }
 
                 /* Adicionando Formações Acadêmicas */
                 for (AcademicFormationModel academic : resumeDto.academics()){
-                    if(!academic.getFoundation().isEmpty() || !academic.getSchooling().isEmpty()){
-                        academic.setResume(resumeModel);
-                        academics.add(academic);
-                    }
+                    academic.setResume(resumeModel);
+                    academics.add(academic);
                 }
 
                 /* Adicionando habilidades */
                 for (SkillModel skill : resumeDto.skills()){
-                    if(!skill.getNameSkill().isEmpty()) {
-                        skill.setResume(resumeModel);
-                        skills.add(skill);
-                    }
+                    skill.setResume(resumeModel);
+                    skills.add(skill);
                 }
 
                 /* Adicionando endereço */
@@ -118,8 +108,7 @@ public class ResumeServiceImpl implements ResumeService {
                 resumeModel.setAddress(resumeDto.address());
                 resumeModel.setContact(resumeDto.contact());
 
-                ResumeModel savedResume;
-                return savedResume = resumeRepository.save(resumeModel);
+                return resumeRepository.save(resumeModel);
             }
 
             return null;
@@ -141,115 +130,58 @@ public class ResumeServiceImpl implements ResumeService {
             ResumeModel existingResumeModel = resumeModelOptional.get();
 
             /* Atualizando Cursos complementares */
-            for (ComplementaryCourseModel complementaryCourse : resumeDto.complementaryCourses()) {
-                if (complementaryCourse.getId() != null) {
-                    Optional<ComplementaryCourseModel> existingComplementaryCourse = complementaryCourseRepository.findById(complementaryCourse.getId());
-                    if (existingComplementaryCourse.isPresent()) {
-                        /* Se por acaso um curso complementar existir e tentar atualizar com campos vazios
-                          vou excluir o curso */
-                        if(complementaryCourse.getCourseName().isEmpty() && complementaryCourse.getFoundation().isEmpty()){
-                            complementaryCourseRepository.deleteById(complementaryCourse.getId());
-                        }else{
-                            existingComplementaryCourse.get().setFoundation(complementaryCourse.getFoundation());
-                            existingComplementaryCourse.get().setCourseName(complementaryCourse.getCourseName());
-                            existingComplementaryCourse.get().setInitialYear(complementaryCourse.getInitialYear());
-                            existingComplementaryCourse.get().setClosingYear(complementaryCourse.getClosingYear());
-                        }
-                    }
+            for(ComplementaryCourseModel complementaryCourse : resumeDto.complementaryCourses()){
+                if(complementaryCourse.isDelete()){
+                    complementaryCourseRepository.deleteById(complementaryCourse.getId());
                 }else{
-                    if(!complementaryCourse.getCourseName().isEmpty() && !complementaryCourse.getFoundation().isEmpty()){
-                        complementaryCourse.setResume(existingResumeModel);
-                        existingResumeModel.getComplementaryCourses().add(complementaryCourse);
-                    }
+                    complementaryCourse.setResume(existingResumeModel);
+                    existingResumeModel.getComplementaryCourses().add(complementaryCourse);
+                    complementaryCourseRepository.save(complementaryCourse);
                 }
             }
 
+
             /* Atualizando Projetos */
-            for (ProjectModel project : resumeDto.projects()) {
-                if (project.getId() != null) {
-                    Optional<ProjectModel> existingProject = projectRepository.findById(project.getId());
-                    if (existingProject.isPresent()) {
-                        /* Se por acaso um projeto existir e tentar atualizar com campos vazios
-                          vou excluir o projeto */
-                        if(project.getTitleProject().isEmpty() && project.getFoundation().isEmpty()){
-                            projectRepository.deleteById(project.getId());
-                        }else{
-                            existingProject.get().setFoundation(project.getFoundation());
-                            existingProject.get().setTitleProject(project.getTitleProject());
-                            existingProject.get().setInitialYear(project.getInitialYear());
-                            existingProject.get().setClosingYear(project.getClosingYear());
-                        }
-                    }
+            for(ProjectModel project : resumeDto.projects()){
+                if(project.isDelete()){
+                    projectRepository.deleteById(project.getId());
                 }else{
-                    if(!project.getTitleProject().isEmpty() && !project.getFoundation().isEmpty()){
-                        project.setResume(existingResumeModel);
-                        existingResumeModel.getProjects().add(project);
-                    }
+                    project.setResume(existingResumeModel);
+                    existingResumeModel.getProjects().add(project);
+                    projectRepository.save(project);
                 }
             }
 
             /* Atualizando Experiencias */
-            for (ExperienceModel experience : resumeDto.experiences()) {
-                if (experience.getId() != null) {
-                    Optional<ExperienceModel> existingExperience = experienceRepository.findById(experience.getId());
-                    if (existingExperience.isPresent()) {
-                        if(experience.getCompany().isEmpty() && experience.getFunctionName().isEmpty()){
-                            experienceRepository.deleteById(experience.getId());
-                        }else{
-                            existingExperience.get().setCompany(experience.getCompany());
-                            existingExperience.get().setFunctionName(experience.getFunctionName());
-                            existingExperience.get().setInitialYear(experience.getInitialYear());
-                            existingExperience.get().setClosingYear(experience.getClosingYear());
-                        }
-                    }
+            for(ExperienceModel experience : resumeDto.experiences()){
+                if(experience.isDelete()){
+                    experienceRepository.deleteById(experience.getId());
                 }else{
-                    if(!experience.getCompany().isEmpty() && !experience.getFunctionName().isEmpty()){
-                        experience.setResume(existingResumeModel);
-                        existingResumeModel.getExperiences().add(experience);
-                    }
+                    experience.setResume(existingResumeModel);
+                    existingResumeModel.getExperiences().add(experience);
+                    experienceRepository.save(experience);
                 }
             }
 
             /* Atualizando Formações Acadêmicas */
-            for (AcademicFormationModel academic : resumeDto.academics()){
-                if(academic.getId() != null){
-                    Optional<AcademicFormationModel> existingAcademicFormation
-                            = academicFormationRepository.findById(academic.getId());
-                    if(existingAcademicFormation.isPresent()){
-                        if(academic.getFoundation().isEmpty() || academic.getSchooling().isEmpty()){
-                            academicFormationRepository.deleteById(academic.getId());
-                        }else {
-                            existingAcademicFormation.get().setFoundation(academic.getFoundation());
-                            existingAcademicFormation.get().setSchooling(academic.getSchooling());
-                            existingAcademicFormation.get().setInitialYear(academic.getInitialYear());
-                            existingAcademicFormation.get().setClosingYear(academic.getClosingYear());
-                        }
-                    }
+            for(AcademicFormationModel academicFormation : resumeDto.academics()){
+                if(academicFormation.isDelete()){
+                    academicFormationRepository.deleteById(academicFormation.getId());
                 }else{
-                    if(!academic.getFoundation().isEmpty() || !academic.getSchooling().isEmpty()){
-                        academic.setResume(existingResumeModel);
-                        existingResumeModel.getAcademics().add(academic);
-                    }
+                    academicFormation.setResume(existingResumeModel);
+                    existingResumeModel.getAcademics().add(academicFormation);
+                    academicFormationRepository.save(academicFormation);
                 }
             }
 
             /* Atualizando Habilidades */
-            for (SkillModel skill : resumeDto.skills()){
-                if(skill.getId() != null){
-                    Optional<SkillModel> existingSkill
-                            = skillRepository.findById(skill.getId());
-                    if(existingSkill.isPresent()){
-                        if(skill.getNameSkill().isEmpty()){
-                            skillRepository.deleteById(skill.getId());
-                        }else{
-                            existingSkill.get().setNameSkill(skill.getNameSkill());
-                        }
-                    }
+            for(SkillModel skill : resumeDto.skills()){
+                if(skill.isDelete()){
+                    skillRepository.deleteById(skill.getId());
                 }else{
-                    if(!skill.getNameSkill().isEmpty()) {
-                        skill.setResume(existingResumeModel);
-                        existingResumeModel.getSkills().add(skill);
-                    }
+                    skill.setResume(existingResumeModel);
+                    existingResumeModel.getSkills().add(skill);
+                    skillRepository.save(skill);
                 }
             }
 
@@ -269,8 +201,7 @@ public class ResumeServiceImpl implements ResumeService {
                 existingResumeModel.getContact().setLinkedin(contact.getLinkedin());
             }
 
-            ResumeModel updatedResume;
-            return updatedResume = resumeRepository.save(existingResumeModel);
+            return resumeRepository.save(existingResumeModel);
         }
 
         return null;

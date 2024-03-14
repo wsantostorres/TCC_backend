@@ -20,6 +20,8 @@ public class ExperienceModel {
     private int initialYear;
     @Column
     private int closingYear;
+    @Column
+    private boolean delete = false;
 
     @ManyToOne
     @JoinColumn(name="resume_id")

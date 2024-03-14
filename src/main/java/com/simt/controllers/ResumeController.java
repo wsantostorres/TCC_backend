@@ -103,8 +103,28 @@ public class ResumeController {
     public ResponseEntity<ResumeModel> updateResume(@PathVariable Long studentId, @PathVariable long resumeId , @RequestBody ResumeDto resumeDto){
         try{
 
-            if(resumeDto.projects().size() > 3 || resumeDto.experiences().size() > 5 || resumeDto.academics().size() > 3
-                    || resumeDto.skills().size() > 5 || resumeDto.complementaryCourses().size() > 5){
+            long validProjectsCount = resumeDto.projects().stream()
+                    .filter(project -> !project.isDelete())
+                    .count();
+
+            long validExperiencesCount = resumeDto.experiences().stream()
+                    .filter(experience -> !experience.isDelete())
+                    .count();
+
+            long validAcademicsCount = resumeDto.academics().stream()
+                    .filter(academic -> !academic.isDelete())
+                    .count();
+
+            long validSkillsCount = resumeDto.skills().stream()
+                    .filter(skill -> !skill.isDelete())
+                    .count();
+
+            long validComplemenryCoursesCount = resumeDto.complementaryCourses().stream()
+                    .filter(complementaryCourse -> !complementaryCourse.isDelete())
+                    .count();
+
+            if(validProjectsCount > 3 || validExperiencesCount > 5 || validAcademicsCount > 3
+                    || validSkillsCount > 5 || validComplemenryCoursesCount > 5){
                 throw new Exception("quantidade nao permitida");
             }
 
@@ -117,7 +137,7 @@ public class ResumeController {
             return ResponseEntity.status(HttpStatus.OK).body(resumeFound);
         }catch (Exception e){
             System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 

@@ -14,6 +14,8 @@ public class SkillModel {
     private Long id;
     @Column
     private String nameSkill;
+    @Column
+    private boolean delete = false;
 
     @ManyToOne
     @JoinColumn(name="resume_id")
