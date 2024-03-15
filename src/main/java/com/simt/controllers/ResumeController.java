@@ -81,7 +81,7 @@ public class ResumeController {
     public ResponseEntity<ResumeModel> createResume(@RequestBody ResumeDto resumeDto,
                                                     @PathVariable Long studentId) {
         try {
-            if(resumeDto.projects().size() > 3 || resumeDto.experiences().size() > 5 || resumeDto.academics().size() > 3
+            if(resumeDto.projects().size() > 5 || resumeDto.experiences().size() > 3 || resumeDto.academics().size() > 3
             || resumeDto.skills().size() > 5 || resumeDto.complementaryCourses().size() > 5){
                 throw new Exception("quantidade nao permitida");
             }
@@ -123,7 +123,7 @@ public class ResumeController {
                     .filter(complementaryCourse -> !complementaryCourse.isDelete())
                     .count();
 
-            if(validProjectsCount > 3 || validExperiencesCount > 5 || validAcademicsCount > 3
+            if(validProjectsCount > 5 || validExperiencesCount > 3 || validAcademicsCount > 3
                     || validSkillsCount > 5 || validComplemenryCoursesCount > 5){
                 throw new Exception("quantidade nao permitida");
             }
