@@ -21,6 +21,8 @@ public class ExperienceModel {
     @Column
     private int closingYear;
     @Column
+    private String activities;
+    @Column
     private boolean delete = false;
 
     @ManyToOne

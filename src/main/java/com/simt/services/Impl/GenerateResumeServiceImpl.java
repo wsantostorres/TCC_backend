@@ -105,7 +105,9 @@ public class GenerateResumeServiceImpl implements GenerateResumeService {
                 StringBuilder experiencesHtml = new StringBuilder();
                 for(ExperienceModel experience : student.getResume().getExperiences()){
                     String valuesExperience = "<li>" + "<p>" + experience.getInitialYear() + "-" + experience.getClosingYear() + " | " + experience.getCompany() + "</p>" +
-                            "<span>" + experience.getFunctionName() + "</span>" + "</li>";
+                            "<span>" + experience.getFunctionName() + "</span>" +
+                            "<p>" + experience.getActivities() + "</p>" +
+                            "</li>";
                     experiencesHtml.append(valuesExperience);
                 }
 
@@ -129,7 +131,9 @@ public class GenerateResumeServiceImpl implements GenerateResumeService {
                 StringBuilder projectsHtml = new StringBuilder();
                 for(ProjectModel project : student.getResume().getProjects()){
                     String valuesProject = "<li>" + "<p>" + project.getInitialYear() + "-" + project.getClosingYear() + " | " + project.getFoundation() + "</p>" +
-                            "<span>" + project.getTitleProject() + "</span>" + "</li>";
+                            "<span>" + project.getTitleProject() + "</span>" +
+                            "<p>" + project.getActivities() + "</p>" +
+                            "</li>";
                     projectsHtml.append(valuesProject);
                 }
 
