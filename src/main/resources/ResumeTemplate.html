@@ -12,6 +12,9 @@
             font-size: 28px;
             margin-top: 0px;
             margin-bottom: 8px;
+            padding-bottom: 4px;
+            border: none;
+            border-bottom: 1px solid #ccc;
         }
 
         h2{
@@ -23,57 +26,38 @@
 
         p{
             margin: 0;
-            font-size: 12px;
-        }
-
-        ul{
-            padding-left: 0px;
+            font-size: 14px;
         }
 
         li{
-            list-style-type: none;
-            font-size: 12px;
-        }
-
-        li + li{
-            margin: 8px 0px;
-        }
-
-        .contatoendereco{
-            margin-bottom: 20px;
-         }
-
-        .contatoendereco p{
-           font-size: 14px; 
+            font-size: 14px;
         }
 
         .contatoendereco span{
             font-weight: bold;
         }
 
+        .contatoendereco, .cursoscomplementares, .projetos, .experiencia, .formacao{
+            margin-bottom: 20px;
+        }
+
+        .cursoscomplementares li + li, .projetos li + li, .experiencia li + li, .formacao li + li{
+            margin: 14px 0px;
+        }
+
+        .cursoscomplementares span, .projetos span, .experiencia span, .formacao span{
+            color: #555555;
+            font-size: 12px;
+        }
+
         .habilidades{
             font-weight: bold;
         }
 
-        .objetivo{
-            margin-bottom: 20px;
+        .habilidades li + li{
+            margin: 8px 0;
         }
 
-        .objetivo p{
-            font-size: 14px;
-        }
-
-        .formacao{
-            margin-bottom: 20px;
-        }
-
-        .projetos{
-            margin-bottom: 20px;
-        }
-
-        .cursoscomplementares{
-            margin-bottom: 20px;
-        }
 
     </style>
 </head>
@@ -84,35 +68,35 @@
     </div>
 
     <div class="formacao">
-        <h2>FORMAÇÃO</h2>
+        {TITLE_FORMACAO}
         <ul>
-            {FORMACAO}
+            {FORMACOES}
         </ul>
     </div>
 
     <div class="cursoscomplementares">
-        <h2>CURSOS COMPLEMENTARES</h2>
+        {TITLE_CURSOS_COMPLEMENTARES}
         <ul>
             {CURSOSCOMPLEMENTARES}
         </ul>
     </div>
 
     <div class="experiencia">
-        <h2>EXPERIÊNCIA</h2>
+        {TITLE_EXPERIENCIA}
         <ul>
             {EXPERIENCIAS}
         </ul>
     </div>
 
     <div class="projetos">
-        <h2>PROJETOS</h2>
+        {TITLE_PROJETO}
         <ul>
             {PROJETOS}
         </ul>
     </div>
 
     <div class="habilidades">
-        <h2>HABILIDADES</h2>
+        {TITLE_HABILIDADES}
         <ul>
             {HABILIDADES}
         </ul>

@@ -88,60 +88,98 @@ public class GenerateResumeServiceImpl implements GenerateResumeService {
                         + addressStudent.getNumber() + " - " + addressStudent.getCity() + "</p>";
                 String email = "<p> <span>Email: </span>" + student.getResume().getContact().getEmail() + "</p>";
                 String phone = "<p> <span>Nº Telefone: </span>" + student.getResume().getContact().getPhone() + "</p>";
-                String linkedin = "<p> <span>Linkedin: </span>" + student.getResume().getContact().getLinkedin() + "</p>";
+                String linkedin = "";
+                if(!student.getResume().getContact().getLinkedin().isEmpty()){
+                    linkedin = "<p> <span>Linkedin: </span>" + student.getResume().getContact().getLinkedin() + "</p>";
+                }
                 addressAndContactHtml.append(email);
                 addressAndContactHtml.append(phone);
                 addressAndContactHtml.append(linkedin);
                 addressAndContactHtml.append(address);
 
-                /* HABILIDADES */
-                StringBuilder skillsHtml = new StringBuilder();
-                for(SkillModel skill : student.getResume().getSkills()){
-                    String valueSkill = "<li>" + skill.getNameSkill() + "</li>";
-                    skillsHtml.append(valueSkill);
-                }
-
-                /* EXPERIÊNCIAS */
-                StringBuilder experiencesHtml = new StringBuilder();
-                for(ExperienceModel experience : student.getResume().getExperiences()){
-                    String valuesExperience = "<li>" + "<p>" + experience.getInitialYear() + "-" + experience.getClosingYear() + " | " + experience.getCompany() + "</p>" +
-                            "<span>" + experience.getFunctionName() + "</span>" +
-                            "<p>" + experience.getActivities() + "</p>" +
-                            "</li>";
-                    experiencesHtml.append(valuesExperience);
-                }
-
                 /* FORMAÇÕES ACADÊMICAS */
                 StringBuilder formationsHtml = new StringBuilder();
+                if(student.getResume().getAcademics().size() > 0){
+                    htmlTemplate = htmlTemplate.replace("{TITLE_FORMACAO}", "<h2>FORMAÇÃO</h2>");
+                }else{
+                    htmlTemplate = htmlTemplate.replace("{TITLE_FORMACAO}", "");
+                }
                 for(AcademicFormationModel academic : student.getResume().getAcademics()){
-                    String valuesAcademic = "<li>" + "<p>" + academic.getInitialYear() + "-" + academic.getClosingYear() + " | " + academic.getFoundation() + "</p>" +
-                             "<span>" + academic.getSchooling() + "</span>" + "</li>";
+                    String valuesAcademic = "<li> <p> <b>" + academic.getSchooling() +  "</b> </p>" +
+                            "<span>" + academic.getInitialYear() +
+                            "-" + academic.getClosingYear() +
+                            " | " + academic.getFoundation() + "</span> </li>";
                     formationsHtml.append(valuesAcademic);
                 }
 
                 /* CURSOS COMPLEMENTARES */
                 StringBuilder complementaryCoursesHtml = new StringBuilder();
+                if(student.getResume().getComplementaryCourses().size() > 0){
+                    htmlTemplate = htmlTemplate.replace("{TITLE_CURSOS_COMPLEMENTARES}", "<h2>CURSOS COMPLEMENTARES</h2>");
+                }else{
+                    htmlTemplate = htmlTemplate.replace("{TITLE_CURSOS_COMPLEMENTARES}", "");
+                }
                 for(ComplementaryCourseModel complementaryCourse : student.getResume().getComplementaryCourses()){
-                    String valuesComplementaryCourse = "<li>" + "<p>" + complementaryCourse.getInitialYear() + "-" + complementaryCourse.getClosingYear() + " | " + complementaryCourse.getFoundation() + "</p>" +
-                            "<span>" + complementaryCourse.getCourseName() + "</span>" + "</li>";
+                    String valuesComplementaryCourse = "<li> <p> <b>"  + complementaryCourse.getCourseName() + "</b></p>" +
+                            "<span>" + complementaryCourse.getInitialYear() +
+                            "-" + complementaryCourse.getClosingYear() +
+                            " | " + complementaryCourse.getFoundation() + "</span> </li>";
                     complementaryCoursesHtml.append(valuesComplementaryCourse);
+
+
+                }
+
+                /* EXPERIÊNCIAS */
+                StringBuilder experiencesHtml = new StringBuilder();
+                if(student.getResume().getExperiences().size() > 0){
+                    htmlTemplate = htmlTemplate.replace("{TITLE_EXPERIENCIA}", "<h2>EXPERIÊNCIAS</h2>");
+                }else{
+                    htmlTemplate = htmlTemplate.replace("{TITLE_EXPERIENCIA}", "");
+                }
+                for(ExperienceModel experience : student.getResume().getExperiences()){
+                    String valuesExperience = "<li>" + "<p> <b>" + experience.getFunctionName() +  " </b> </p>" +
+                            "<span>"+ experience.getInitialYear() + "-" +
+                            experience.getClosingYear() +
+                            " | " + experience.getCompany() + "</span>" +
+                            "<p class=\"activities\">" + experience.getActivities() + "</p>" +
+                            "</li>";
+                    experiencesHtml.append(valuesExperience);
                 }
 
                 /* PROJETOS */
                 StringBuilder projectsHtml = new StringBuilder();
+                if(student.getResume().getProjects().size() > 0){
+                    htmlTemplate = htmlTemplate.replace("{TITLE_PROJETO}", "<h2>PROJETOS</h2>");
+                }else{
+                    htmlTemplate = htmlTemplate.replace("{TITLE_PROJETO}", "");
+                }
                 for(ProjectModel project : student.getResume().getProjects()){
-                    String valuesProject = "<li>" + "<p>" + project.getInitialYear() + "-" + project.getClosingYear() + " | " + project.getFoundation() + "</p>" +
-                            "<span>" + project.getTitleProject() + "</span>" +
-                            "<p>" + project.getActivities() + "</p>" +
+                    String valuesProject = "<li>" + "<p> <b>" + project.getTitleProject() + "</b> </p>" +
+                            "<span>" + project.getInitialYear() +
+                            "-" + project.getClosingYear() +
+                            " | " + project.getFoundation() + "</span>" +
+                            "<p class=\"activities\">" + project.getActivities() + "</p>" +
                             "</li>";
                     projectsHtml.append(valuesProject);
+                }
+
+                /* HABILIDADES */
+                StringBuilder skillsHtml = new StringBuilder();
+                if(student.getResume().getSkills().size() > 0){
+                    htmlTemplate = htmlTemplate.replace("{TITLE_HABILIDADES}", "<h2>HABILIDADES</h2>");
+                }else{
+                    htmlTemplate = htmlTemplate.replace("{TITLE_HABILIDADES}", "");
+                }
+                for(SkillModel skill : student.getResume().getSkills()){
+                    String valueSkill = "<li>" + skill.getNameSkill() + "</li>";
+                    skillsHtml.append(valueSkill);
                 }
 
                 /* Substituir informações do currículo do Aluno aqui */
                 htmlTemplate = htmlTemplate.replace("{NOMECOMPLETO}", student.getFullName());
                 htmlTemplate = htmlTemplate.replace("{CONTATOENDERECO}", addressAndContactHtml);
                 htmlTemplate = htmlTemplate.replace("{HABILIDADES}", skillsHtml);
-                htmlTemplate = htmlTemplate.replace("{FORMACAO}", formationsHtml);
+                htmlTemplate = htmlTemplate.replace("{FORMACOES}", formationsHtml);
                 htmlTemplate = htmlTemplate.replace("{PROJETOS}", projectsHtml);
                 htmlTemplate = htmlTemplate.replace("{EXPERIENCIAS}", experiencesHtml);
                 htmlTemplate = htmlTemplate.replace("{CURSOSCOMPLEMENTARES}", complementaryCoursesHtml);
