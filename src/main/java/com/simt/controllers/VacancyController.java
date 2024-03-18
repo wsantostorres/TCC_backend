@@ -271,6 +271,10 @@ public class VacancyController {
                 VacancyModel vacancy = vacancyOptional.get();
                 CourseModel studentCourse = student.getCourse();
 
+                if(vacancyOptional.get().getClosingDate().isBefore(LocalDateTime.now())){
+                    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
+                }
+
                 if (!vacancy.getCourses().contains(studentCourse)) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
                 }
