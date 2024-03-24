@@ -13,5 +13,6 @@ RUN mvn package
 # Execução
 FROM openjdk:17
 WORKDIR /app
-COPY --from=build /app/target/generic-service-1.0-SNAPSHOT.jar ./generic-service.jar
-ENTRYPOINT ["java", "-jar", "generic-service.jar"]
+COPY --from=build /app/target/simt-0.0.1-SNAPSHOT.jar ./simt.jar
+
+ENTRYPOINT ["java", "-jar", "simt.jar"]
