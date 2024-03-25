@@ -372,7 +372,7 @@ public class VacancyController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Object> deleteVacancy(@PathVariable long id, @RequestBody VacancyDeleteDto vacancyDeleteDto){
         try{
             Optional<VacancyModel> vacancyOptional = vacancyRepository.findById(id);

@@ -34,16 +34,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody UserRegisterDto userRegisterDto){
         try{
-            if(userRegisterDto.bondType().equals("Servidor")){
-                EmployeeModel newUser = new EmployeeModel();
-                newUser.setId(userRegisterDto.id());
-                newUser.setRegistration(userRegisterDto.registration());
-                newUser.setFullName(userRegisterDto.fullName());
-                newUser.setBondType(userRegisterDto.bondType());
-
-                EmployeeModel employeeCreated = employeeRepository.save(newUser);
-                return ResponseEntity.status(HttpStatus.CREATED).body(employeeCreated);
-            }else if(userRegisterDto.bondType().equals("Aluno")){
+            if(userRegisterDto.bondType().equals("Aluno")){
                 StudentModel newUser = new StudentModel();
                 newUser.setId(userRegisterDto.id());
                 newUser.setRegistration(userRegisterDto.registration());
@@ -131,7 +122,7 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.OK).body(dataEmployee);
                 }
 
-                return ResponseEntity.status(HttpStatus.OK).body(UserId);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vínculo não permitido.");
 
             }else{
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vínculo não permitido.");
